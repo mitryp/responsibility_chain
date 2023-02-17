@@ -46,7 +46,8 @@ class FunctionalNode<R, A> extends ResponsibilityNode<R, A> {
 
   /// Creates a [FunctionalNode] from [VoidFunctionHandler] which does not take any arguments.
   ///
-  FunctionalNode(VoidFunctionHandler<R> handler) : handler = ((args) => handler());
+  FunctionalNode(VoidFunctionHandler<R> handler)
+      : handler = ((args) => handler());
 
   /// Creates a [FunctionalNode] from [FunctionHandler], which takes an argument of the type [A].
   ///

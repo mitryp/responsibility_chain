@@ -12,11 +12,11 @@ import 'typedefs.dart';
 /// information.
 ///
 abstract class IResponsibilityChain<R, A> {
-  /// A list of nodes that are currently chained to this responsibility chain.
+  /// The list of nodes that are currently chained to this responsibility chain.
   ///
   List<Supplier<ResponsibilityNode<R, A>>> get nodes;
 
-  /// A function that returns the default value of type [R].
+  /// The function that returns the default value of type [R].
   ///
   /// The result of this function will be used when none of the handler nodes succeed to return the
   /// result.
@@ -32,13 +32,20 @@ abstract class IResponsibilityChain<R, A> {
   /// Chains the given function to this chain. The given function will be wrapped in the closure
   /// returning a [FunctionalNode] object.
   ///
-  /// - The [functionHandler] is a [FunctionHandler].
+  /// - The [functionHandler] is a [FunctionHandler]. It must either return [ChainResult]<[R]> or
+  /// throw one of [Exception] subclasses.
   ///
   void funcNode(FunctionHandler<R, A> functionHandler);
 
-  /// Returns the value provided by the first succeeded handler node of this chain.
+  /// This method iterates through the chained nodes in the precise order they have been chained and
+  /// calls the [ResponsibilityNode.handle] method with the argument of [args].
   ///
-  /// If no node has succeeded, returns the value provided by the [orElse] function.
+  /// If a node returns a successful result, the method stops iterating and returns the result.
+  /// Otherwise, if the result is not successful or throws an exception is thrown, the method
+  /// proceeds to the next chained node.
+  ///
+  /// If no chained node succeeded to return a successful result, the result of [orElse] function is
+  /// returned.
   ///
   Future<R> handle(A args);
 }
@@ -58,7 +65,8 @@ class ResponsibilityChainWithArgs<R, A> implements IResponsibilityChain<R, A> {
   ResponsibilityChainWithArgs({required this.orElse});
 
   @override
-  void node(Supplier<ResponsibilityNode<R, A>> layerNodeSupplier) => nodes.add(layerNodeSupplier);
+  void node(Supplier<ResponsibilityNode<R, A>> layerNodeSupplier) =>
+      nodes.add(layerNodeSupplier);
 
   @override
   void funcNode(FunctionHandler<R, A> functionHandler) =>
@@ -102,7 +110,8 @@ class ResponsibilityChainWithArgs<R, A> implements IResponsibilityChain<R, A> {
 /// - The [funcNode] method takes the function returning the [ChainResult] and wraps it in a
 /// [FunctionalNode] before chaining;
 /// - The [handle] method returns the Future of [R] and lets the chained handle nodes successively
-/// try to return the value. If none of the handlers succeed, the result of [orElse] will be returned.
+/// try to return the value. If none of the handlers succeed, the result of [orElse] will be
+/// returned.
 ///
 class ResponsibilityChain<R> extends ResponsibilityChainWithArgs<R, void> {
   ResponsibilityChain({required super.orElse});
