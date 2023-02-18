@@ -1,3 +1,7 @@
+[![Dart Tests](https://github.com/mitryp/responsibility_chain/actions/workflows/dart.yml/badge.svg)](https://github.com/mitryp/responsibility_chain/actions/workflows/dart.yml?branch=master)
+[![Pub package](https://img.shields.io/pub/v/responsibility_chain.svg)](https://pub.dev/packages/responsibility_chain)
+[![Package publisher](https://img.shields.io/pub/publisher/responsibility_chain.svg)](https://pub.dev/packages/responsibility_chain/publisher)
+
 ## Asynchronous Responsibility Chain Pattern
 
 This library provides an implementation of the Responsibility Chain pattern that works asynchronously and utilizes
