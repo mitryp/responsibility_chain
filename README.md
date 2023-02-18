@@ -4,10 +4,12 @@ This library provides an implementation of the Responsibility Chain pattern that
 the functional and object-oriented approaches to creating responsibility handlers.
 
 > The Responsibility Chain pattern is a behavioral design pattern that allows an object to pass a request through a
->  chain of handlers until one of them handles the request. By doing so, the pattern decouples the sender and receiver of
+> chain of handlers until one of them handles the request. By doing so, the pattern decouples the sender and receiver of
 > the request and allows multiple handlers to handle the request without knowing about each other.
-> 
-> ![Responsibility Chain Pattern Illustration](https://github.com/mitryp/responsibility_chain/tree/master/_images/illustration.webp)
+>
+> <img src="https://raw.githubusercontent.com/mitryp/responsibility_chain/master/_images/illustration.webp" alt="Responsibility Chain Pattern Illustration"/>
+>
+> [_Image source_](https://refactoring.guru/design-patterns/chain-of-responsibility)
 
 This package enables using a functional or object-oriented approach to define the handlers of responsibility.
 It provides `ResponsibilityChain` and `ResponsibilityChainWithArgs` classes, which allow you to chain multiple handlers
