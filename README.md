@@ -77,8 +77,7 @@ const exchangeRateServerMock = {
 
 ### ResponsibilityChain classes
 
-These classes are responsible for chaining handlers and distributing the responsibility between them in the order
-of they were chained.
+These classes are responsible for chaining handlers and distributing the responsibility between them in the order they were chained.
 
 - `ResponsibilityChainWithArgs<R, A>` - a chain that returns a value of a generic type `R` and passes the argument of a
   generic type `A` to each handler during the iteration;
@@ -90,7 +89,10 @@ Both of the classes have the following interface method signatures:
 - `void node(Supplier<ResponsibilityNode<R, A>>)` - chains an object of a [ResponsibilityNode<R, A>](#Object-Handlers)
   subclass to this chain. Takes a closure that returns a `ResponsibilityNode<R, A>`;
 - `void funcNode(FunctionHandler<R, A>)` - chains a [FunctionHandler<R, A>](#Functional-Handlers) to this chain;
-- `Future<R> handle(A args)` - iterates through the chained responsibility nodes sequentially and
+- `Future<R> handle(A args)` - iterates through the chained responsibility nodes sequentially and calls the node's 
+`handle` method passing the `args` as the argument. If the node returns a successful result, the value of this node
+will be returned. Otherwise, if the result is unsuccessful or the node throws an exception, the chain proceeds to the 
+next node. If none of the handlers return a successful result, the chain will return the result of the `orElse` function.
 
 ### ChainResult
 
