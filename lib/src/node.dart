@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import '../responsibility_chain.dart';
-import 'typedefs.dart';
 
 /// A base class representing the responsibility chain handler node, intended for overriding by
 /// custom subclasses.

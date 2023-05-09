@@ -8,9 +8,10 @@ import 'package:responsibility_chain/responsibility_chain.dart';
 /// the base class can be inherited from or mixed with to implement more complex abstractions.
 ///
 void main() async {
-  final rateFetchRespChain = ResponsibilityChainWithArgs<double, int>(orElse: (_) => -1)
-    ..funcNode((args) => databaseFetchHandler(args))
-    ..funcNode(serverFetchHandler);
+  final rateFetchRespChain =
+      ResponsibilityChainWithArgs<double, int>(orElse: (_) => -1)
+        ..funcNode((args) => databaseFetchHandler(args))
+        ..funcNode(serverFetchHandler);
 
   // the result handling is always happens asynchronously
   // the argument will be passed to each of the handler nodes during the execution

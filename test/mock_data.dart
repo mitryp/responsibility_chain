@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:responsibility_chain/responsibility_chain.dart';
-import 'package:responsibility_chain/src/typedefs.dart';
 
 final rand = Random();
 

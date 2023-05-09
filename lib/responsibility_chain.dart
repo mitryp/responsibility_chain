@@ -16,3 +16,4 @@ import 'src/node.dart';
 export 'src/chain.dart' show ResponsibilityChain, ResponsibilityChainWithArgs;
 export 'src/node.dart' show ResponsibilityNode, FunctionalNode;
 export 'src/result.dart' show ChainResult;
+export 'src/typedefs.dart' show FunctionHandler, VoidFunctionHandler;

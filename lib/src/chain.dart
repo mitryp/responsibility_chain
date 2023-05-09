@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'node.dart';
 import 'result.dart';
@@ -79,19 +78,15 @@ class ResponsibilityChainWithArgs<R, A> implements IResponsibilityChain<R, A> {
     for (final nodeSupplier in nodes) {
       final node = nodeSupplier.call();
 
-      _debugLog('awaiting node');
       try {
         lastResult = await node.handle(args);
       } on Exception {
-        _debugLog('got an exception. continuing');
         continue;
       }
 
-      _debugLog('result successful: ${lastResult.isSuccessful}');
       if (lastResult.isSuccessful) return lastResult.value;
     }
 
-    _debugLog('calling orElse');
     return orElse.call(args);
   }
 }
@@ -119,5 +114,3 @@ class ResponsibilityChain<R> extends ResponsibilityChainWithArgs<R, void> {
   @override
   Future<R> handle([void args]) => super.handle(args);
 }
-
-void _debugLog(String message) => log(message, name: 'responsibility_chain');
