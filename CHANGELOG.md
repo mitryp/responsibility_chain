@@ -1,3 +1,8 @@
+## 2.0.0-dev.1
+
+- Removed the `ResponsibilityNode`, `FunctionNode`, `FunctionHandler`, `ResponsibilityChain.node`,
+  and `ResponsibilityChain.funcNode` entities.
+
 ## 1.1.0
 
 - Unified the handler types with new `IResponsibilityNode` signature and `IResponsibilityNodeBase` hint interface.
