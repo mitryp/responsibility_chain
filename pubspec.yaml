@@ -1,6 +1,6 @@
 name: responsibility_chain
 description: An asynchronous Responsibility Chain design pattern implementation with functional and object-oriented approaches to implementing handlers of responsibility.
-version: 1.0.3
+version: 1.1.0
 repository: https://github.com/mitryp/responsibility_chain
 issue_tracker: https://github.com/mitryp/responsibility_chain/issues
 
@@ -10,3 +10,6 @@ environment:
 dev_dependencies:
   lints: ^2.0.0
   test: ^1.16.0
+
+dependencies:
+  meta: ^1.15.0

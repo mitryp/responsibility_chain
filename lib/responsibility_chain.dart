@@ -10,10 +10,8 @@
 ///
 library responsibility_chain;
 
-import 'src/chain.dart';
-import 'src/node.dart';
-
+export 'src/abs/node.dart' show IResponsibilityNode, IResponsibilityNodeBase;
 export 'src/chain.dart' show ResponsibilityChain, ResponsibilityChainWithArgs;
 export 'src/node.dart' show ResponsibilityNode, FunctionalNode;
 export 'src/result.dart' show ChainResult;
-export 'src/typedefs.dart' show FunctionHandler, VoidFunctionHandler;
+export 'src/typedefs.dart' show FunctionHandler, VoidFunctionHandler, Supplier;

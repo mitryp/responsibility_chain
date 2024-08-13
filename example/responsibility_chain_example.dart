@@ -1,17 +1,16 @@
 import 'package:responsibility_chain/responsibility_chain.dart';
 
-/// This example demonstrates how to use the FunctionHandlers of the `responsibility_chain` package.
-/// The usage of the ResponsibilityNode subclasses will look exactly the same, but with an
+/// This example demonstrates how to use create and use responsibility nodes from the `responsibility_chain` package.
+/// The usage of the IResponsibilityNodeBase subclasses will look exactly the same, but with an
 /// additional step of creating inherited classes for handlers.
-///
-/// I consider it a good idea to use FunctionHandlers to simplify your code when possible, though
-/// the base class can be inherited from or mixed with to implement more complex abstractions.
-///
 void main() async {
-  final rateFetchRespChain =
-      ResponsibilityChainWithArgs<double, int>(orElse: (_) => -1)
-        ..funcNode((args) => databaseFetchHandler(args))
-        ..funcNode(serverFetchHandler);
+  // create a chain instance and chain handlers to it
+  final rateFetchRespChain = ResponsibilityChainWithArgs<double, int>(
+      orElse: (_) => -1)
+    // the handlers can be functions with the [IResponsibilityNode] signature
+    ..chain(localCacheHandler)
+    // or [IResponsibilityNodeBase]-like objects for more complex logic
+    ..chain(const ServerFetchHandler());
 
   // the result handling is always happens asynchronously
   // the argument will be passed to each of the handler nodes during the execution
@@ -31,21 +30,30 @@ void main() async {
   print(await rateFetchRespChain.handle(20230209));
 }
 
-/* Mocks */
+/* Chain Nodes examples */
 
-ChainResult<double> databaseFetchHandler(int date) {
+/// A functional-style handler. Must comply to the [IResponsibilityNode] signature.
+ChainResult<double> localCacheHandler(int date) {
   final rate = localDatabaseMock[date];
 
   if (rate == null) return ChainResult.failure();
   return ChainResult.success(rate);
 }
 
-// handlers can return both ChainResult<R> and Future<ChainResult<R>>
-Future<ChainResult<double>> serverFetchHandler(int date) async {
-  final rate = exchangeRateServerMock[date];
+/// An object-style handler.
+/// Must have a [call] function complying to the [IResponsibilityNode] signature.
+///
+/// It is not required to implement [IResponsibilityNodeBase], but this way the analyzer will hint the types for you.
+class ServerFetchHandler implements IResponsibilityNodeBase<double, int> {
+  const ServerFetchHandler();
 
-  if (rate == null) return ChainResult.failure();
-  return ChainResult.success(rate);
+  @override
+  Future<ChainResult<double>> call(int date) async {
+    final rate = exchangeRateServerMock[date];
+
+    if (rate == null) return ChainResult.failure();
+    return ChainResult.success(rate);
+  }
 }
 
 const localDatabaseMock = {
@@ -62,33 +70,3 @@ const exchangeRateServerMock = {
   20230213: 13.0,
   20230212: 12.0,
 };
-
-// void main() {
-//   final chain = ResponsibilityChain<int>()
-//     ..node(() => DatabaseFetchHandler())
-//     ..node(() => ApiFetchHandler());
-//
-//   chain.handle().then(print);
-// }
-//
-//
-// // final chain = ResponsibilityChain<int, void>()
-// //   ..funcNode((_) => ChainResult.failure())
-// //   ..funcNode((_) => ChainResult.success(31122003))
-// //   ..orElse((_) => 0);
-//
-// class DatabaseFetchHandler extends ResponsibilityNode<int, void> {
-//   @override
-//   Future<ChainResult<int>> handle(void args) async => ChainResult.success(await compute());
-//
-//   Future<int> compute() {
-//     return Future.delayed(const Duration(milliseconds: 500), () {
-//       throw Exception();
-//     });
-//   }
-// }
-//
-// class ApiFetchHandler extends ResponsibilityNode<int, void> {
-//   @override
-//   Future<ChainResult<int>> handle(void args) => Future.value(ChainResult.success(14022022));
-// }
