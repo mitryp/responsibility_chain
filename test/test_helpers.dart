@@ -1,4 +1,5 @@
 import 'package:responsibility_chain/responsibility_chain.dart';
+import 'package:responsibility_chain/src/abs/node.dart';
 import 'package:responsibility_chain/src/chain.dart';
 import 'package:test/test.dart';
 
@@ -18,9 +19,6 @@ ChainResult<int> conditionalFailChainResult(int args) =>
 
 void chainNodesTo<R, A>(
   IResponsibilityChain<R, A> chain, {
-  required Iterable<ResponsibilityNode<R, A>> nodes,
-}) {
-  for (final node in nodes) {
-    chain.node(() => node);
-  }
-}
+  required Iterable<IResponsibilityNode<R, A>> nodes,
+}) =>
+    nodes.forEach(chain.chain);
