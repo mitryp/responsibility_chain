@@ -40,7 +40,7 @@ ChainResult<double> localCacheHandler(int date) {
   return ChainResult.success(rate);
 }
 
-/// A object-style handler.
+/// An object-style handler.
 /// Must have a [call] function complying to the [IResponsibilityNode] signature.
 ///
 /// It is not required to implement [IResponsibilityNodeBase], but this way the analyzer will hint the types for you.

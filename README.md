@@ -15,10 +15,10 @@ the functional and object-oriented approaches to creating responsibility handler
 >
 > [_Image source_](https://refactoring.guru/design-patterns/chain-of-responsibility)
 
-This package enables using a functional or object-oriented approach to define the handlers of responsibility.
+This package enables using a functional or object-oriented approach to define handlers of responsibility.
 It provides `ResponsibilityChain` and `ResponsibilityChainWithArgs` classes, which allow you to chain multiple handlers
-together using the `node` and `funcNode` methods for object and functional handlers respectively.
-You must also specify the `orElse` function when creating a chain object. The result of this function will be returned
+together using the `chain` method.
+You also need to specify the `orElse` function when creating a chain object. The result of this function will be returned
 if none of the handlers return a result.
 
 ## Usage
@@ -32,8 +32,10 @@ void main() async {
   // the `double` type parameter is the type of value returned by the `handle` method of the chain
   // the `int` type parameter is the type of argument of the `handle` method of the chain
   final rateFetchRespChain = ResponsibilityChainWithArgs<double, int>(orElse: (_) => -1)
-      ..funcNode(databaseFetchHandler)
-      ..funcNode(serverFetchHandler);
+    // the handlers can be functions with the [IResponsibilityNode] signature
+    ..chain(localCacheHandler)
+    // or [IResponsibilityNodeBase]-like objects for more complex logic
+    ..chain(const ServerFetchHandler());
 
   // the result handling always happens asynchronously
   // the argument will be passed to each of the handler nodes during the execution
@@ -53,19 +55,28 @@ void main() async {
   print(await rateFetchRespChain.handle(20230209));
 }
 
-ChainResult<double> databaseFetchHandler(int date) {
+/// A functional-style handler. Must comply to the [IResponsibilityNode] signature.
+ChainResult<double> localCacheHandler(int date) {
   final rate = localDatabaseMock[date];
 
   if (rate == null) return ChainResult.failure();
   return ChainResult.success(rate);
 }
 
-// handlers can return both ChainResult<R> and Future<ChainResult<R>>
-Future<ChainResult<double>> serverFetchHandler(int date) async {
-  final rate = exchangeRateServerMock[date];
+/// An object-style handler.
+/// Must have a [call] function complying to the [IResponsibilityNode] signature.
+///
+/// It is not required to implement [IResponsibilityNodeBase], but this way the analyzer will hint the types for you.
+class ServerFetchHandler implements IResponsibilityNodeBase<double, int> {
+  const ServerFetchHandler();
 
-  if (rate == null) return ChainResult.failure();
-  return ChainResult.success(rate);
+  @override
+  Future<ChainResult<double>> call(int date) async {
+    final rate = exchangeRateServerMock[date];
+
+    if (rate == null) return ChainResult.failure();
+    return ChainResult.success(rate);
+  }
 }
 
 const localDatabaseMock = {
@@ -81,7 +92,8 @@ const exchangeRateServerMock = {
 
 ### ResponsibilityChain classes
 
-These classes are responsible for chaining handlers and distributing the responsibility between them in the order they were chained.
+These classes are responsible for chaining handlers and distributing the responsibility between them in the order they
+were chained.
 
 - `ResponsibilityChainWithArgs<R, A>` - a chain that returns a value of a generic type `R` and passes the argument of a
   generic type `A` to each handler during the iteration;
@@ -90,66 +102,78 @@ These classes are responsible for chaining handlers and distributing the respons
 
 Both of the classes have the following interface method signatures:
 
-- `void node(Supplier<ResponsibilityNode<R, A>>)` - chains an object of a [ResponsibilityNode<R, A>](#Object-Handlers)
-  subclass to this chain. Takes a closure that returns a `ResponsibilityNode<R, A>`;
-- `void funcNode(FunctionHandler<R, A>)` - chains a [FunctionHandler<R, A>](#Functional-Handlers) to this chain;
-- `Future<R> handle(A args)` - iterates through the chained responsibility nodes sequentially and calls the node's 
-`handle` method passing the `args` as the argument. If the node returns a successful result, the value of this node
-will be returned. Otherwise, if the result is unsuccessful or the node throws an exception, the chain proceeds to the 
-next node. If none of the handlers return a successful result, the chain will return the result of the `orElse` function.
+- `void chain(IResponsibilityNode<R, A>)` - adds next handler to the end of the chain. The handler can either be a
+  function with the `IResponsibilityNode` signature, or an ancestor of the `IResponsibilityNodeBase` class implementing
+  a `call` method with the same signature.
+- `Future<R> handle(A arg)` - iterates through the chained nodes sequentially and calls each node's
+  `handle` method passing the `arg` as the argument. If the node returns a successful result, the value of the
+  computation
+  will be returned. Otherwise, if the result is unsuccessful or the node throws an exception, the chain proceeds to the
+  next node. If none of the handlers return a successful result, the chain will return the result of the `orElse`
+  function.
 
 ### ChainResult
 
-This class is a monad wrapper around the result of chain computation. Each handler must return an instance of this 
+This class is a monad wrapper around the result of chain computation. Each handler must return an instance of this
 class, either successful or unsuccessful, or throw an Exception derived object.
 
 - The successful `ChainResult` is created by calling `ChainResult.success(R value)`. If a handler returns a successful
-ChainResult, its value will be returned by the chain;
+  ChainResult, its value will be returned by the chain;
 - The unsuccessful `ChainResult` is created by calling `ChainResult.failure()`. If a handler returns an unsuccessful
-ChainResult, the chain will proceed to the next handler.
+  ChainResult, the chain will proceed to the next handler.
 
 ### Functional Handlers
 
-The `funcNode` method of the chain is used to add a new functional handler.
+The `chain` method of the chain can be used to add a new functional handler.
 
-It takes a `FunctionalHandler<R, A>` - a function that takes an argument of type `A` and returns
+It takes an `IResponsibilityNode<R, A>` - a function that takes an argument of type `A` and returns
 a `FutureOr<ChainResult<R>>`.
 
 The syntax of the usage of the functional handler is as follows:
 
 ```dart
-chain.funcNode((A args) {
-  if (successCondition) return ChainResult<R>.success(value);
-  else return ChainResult<R>.failure();
+chain.chain((A arg) {
+  if (successCondition) {
+    return ChainResult<R>.success(value);
+  }
+  
+  return ChainResult<R>.failure();
 });
 ```
-
-Internally, the functional handlers are wrapped into a `FunctionalNode` class object.
 
 > When the argument does not influence the result of the handler, its name can be replaced with the `_` symbol.
 
 ### Object Handlers
 
-The `node` method of the chain is used to add a new object handler.
+The `chain` method of the chain can also be used to add a new object handler.
 
-It takes a `ResponsibilityNode<R, A>` subclass object.
+It takes an `IResponsibilityNodeBase<R, A>`-like class object. Object handlers don't have any additional
+advantages except there can be more decomposition and management opportunities for objects compared to functions -
+it depends on your project structure.
 
-To implement a `ResponsibilityNode<R, A>` subclass, you must implement its `handle` method as follows:
+To implement an `IResponsibilityNodeBase<R, A>`, you only need to implement its `call` method with the signature of
+`IResponsibilityNode`:
 
 ```dart
-class MyResponsibilityNode extends ResponsibilityNode<R, A> {
-  FutureOr<ChainResult<R>> handle(A args) {
-    if (successCondition) return ChainResult.success(value);
-    else return ChainResult.failure();
+class MyResponsibilityNode extends IResponsibilityNodeBase<R, A> {
+  FutureOr<ChainResult<R>> call(A args) {
+    if (successCondition) {
+      return ChainResult.success(value);
+    }
+    
+    return ChainResult.failure();
   }
 }
 ```
 
-> Using the functional approach requires less code to implement the handler, but it makes it more complicated to 
-create abstractions in that way.
+> It is not necessary for a class to directly implement the `IResponsibilityNodeBase` interface.
+> The only requirement is for the class to have the `call` method with the correct signature.
+> The interface will allow the analyzer to hint the types though.
 
+> Using the functional approach requires less code to implement the handler, but it makes creating complex abstractions 
+> harder.
 
 ## Additional information
 
-The contributions and bug reports are welcome at project's 
+The contributions and bug reports are welcome at project's
 [GitHub repository](https://github.com/mitryp/responsibility_chain).
