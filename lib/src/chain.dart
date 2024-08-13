@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 
 import 'abs/node.dart';
-import 'adapter/deprecated_node_adapter.dart';
-import 'node.dart';
 import 'result.dart';
 import 'typedefs.dart';
 
@@ -25,24 +23,6 @@ abstract class IResponsibilityChain<R, A> {
   /// result.
   @visibleForTesting
   ParametrizedSupplier<R, A> get orElse;
-
-  /// Chains the given node to this chain.
-  ///
-  /// - The [layerNode] is a function returning a [ResponsibilityNode] ancestor object.
-  @Deprecated(
-    'ResponsibilityChain.node is replaced by ResponsibilityNode.chain and will be removed in 2.0.0',
-  )
-  void node(Supplier<ResponsibilityNode<R, A>> layerNode);
-
-  /// Chains the given function to this chain. The given function will be wrapped in the closure
-  /// returning a [FunctionalNode] object.
-  ///
-  /// - The [functionHandler] is a [FunctionHandler]. It must either return [ChainResult]<[R]> or
-  /// throw one of [Exception] subclasses.
-  @Deprecated(
-    'ResponsibilityChain.funcNode is replaced by ResponsibilityNode.chain and will be removed in 2.0.0',
-  )
-  void funcNode(FunctionHandler<R, A> functionHandler);
 
   /// Adds a given [node] to this chain.
   ///
@@ -76,20 +56,6 @@ class ResponsibilityChainWithArgs<R, A> implements IResponsibilityChain<R, A> {
   final ParametrizedSupplier<R, A> orElse;
 
   ResponsibilityChainWithArgs({required this.orElse});
-
-  @Deprecated(
-    'ResponsibilityChain.node is replaced by ResponsibilityChain.chain and will be removed in 2.0.0',
-  )
-  @override
-  void node(Supplier<ResponsibilityNode<R, A>> layerNodeSupplier) =>
-      nodes.add(wrapDeprecatedNode(layerNodeSupplier()));
-
-  @Deprecated(
-    'ResponsibilityNode.funcNode is replaced by ResponsibilityChain.chain and will be removed in 2.0.0',
-  )
-  @override
-  void funcNode(FunctionHandler<R, A> functionHandler) =>
-      node(() => FunctionalNode.withArgs(functionHandler));
 
   @override
   void chain(IResponsibilityNode<R, A> node) => nodes.add(node);

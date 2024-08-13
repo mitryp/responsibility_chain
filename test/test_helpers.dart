@@ -1,11 +1,10 @@
 import 'package:responsibility_chain/responsibility_chain.dart';
-import 'package:responsibility_chain/src/abs/node.dart';
 import 'package:responsibility_chain/src/chain.dart';
 import 'package:test/test.dart';
 
 Future<void> testConditionalFailNode(
-    ResponsibilityNode<int, int> node, int value) async {
-  final res = await node.handle(value);
+    IResponsibilityNode<int, int> node, int value) async {
+  final res = await node(value);
 
   if (res.isSuccessful) {
     expect(res.value, equals(value * 2));
