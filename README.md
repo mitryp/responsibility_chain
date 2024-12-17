@@ -4,11 +4,8 @@
 
 ## Asynchronous Responsibility Chain Pattern
 
-> **This is a pre-release version of 2.0.0 removing the `node` and `funcNode` methods and respective handler classes. 
+> **Version 2.0.0 removed the `node` and `funcNode` methods and respective handler classes. 
 > Refer to the README for updated usage info.**
-> 
-> This release is stable though and exists to give the dependent packages some time to adapt to the changes before 
-> rolling 2.0.0 out.
 
 This library provides an implementation of the Responsibility Chain pattern that works asynchronously and utilizes
 the functional and object-oriented approaches to creating responsibility handlers.
