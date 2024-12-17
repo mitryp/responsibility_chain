@@ -36,17 +36,16 @@ void testChainResult() {
 void testResponsibilityNodes() {
   group('ResponsibilityNode tests', () {
     test('ResponsibilityNodes with parameters succeed and fail correctly', () {
-      final conditionalFailNode = ResponsibilityNodeMock<int>(
-        conditionalFailChainResult,
-      );
+      final conditionalFailNode =
+          IResponsibilityNodeMock<int>(conditionalFailChainResult, id: 1);
       repeatedIntTest(
         (value) => testConditionalFailNode(conditionalFailNode, value),
       );
     });
 
     test('FunctionalNodes with parameters succeed and fail correctly', () {
-      final conditionalFailNode =
-          FunctionalNode<int, int>.withArgs(conditionalFailChainResult);
+      final IResponsibilityNode<int, int> conditionalFailNode =
+          conditionalFailChainResult;
       repeatedIntTest(
         (value) => testConditionalFailNode(conditionalFailNode, value),
       );
