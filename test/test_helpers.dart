@@ -1,4 +1,5 @@
 import 'package:responsibility_chain/responsibility_chain.dart';
+import 'package:responsibility_chain/src/abs/node.dart';
 import 'package:responsibility_chain/src/chain.dart';
 import 'package:test/test.dart';
 
