@@ -7,7 +7,7 @@ final rand = Random();
 
 int randInt({int min = -1000, int max = 1000}) => rand.nextInt(max - min) + min;
 
-class IResponsibilityNodeMock<T> extends IResponsibilityNodeBase<int, T> {
+class IResponsibilityNodeMock<T> implements IResponsibilityNodeBase<int, T> {
   final int id;
   final IResponsibilityNode<int, T> handler;
   final bool? willSucceed;
