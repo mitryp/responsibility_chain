@@ -6,7 +6,29 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
+  pana:
+    name: Pana Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Install dependencies
+        run: dart pub get --no-example
+
+      - name: Activate pana
+        run: dart pub global activate pana
+
+      - name: Run pana
+        run: pana --exit-code-threshold 150 .
+
   publish:
+    needs: pana
+    name: Publish Package
     permissions:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
