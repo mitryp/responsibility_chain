@@ -1,4 +1,12 @@
-## 1.1.0
+## 2.1.0
+
+- Made the IResponsibilityNodeBase an interface instead of abstract class, so that classes that already extend other
+  classes can still be responsibility nodes.
+- Lifted the Dart SDK version constraint to `>=3.0.0`.
+- Upgraded package dependencies.
+- Updated GitHub Actions workflows.
+
+## 2.0.0
 
 - Unified the handler types with new `IResponsibilityNode` signature and `IResponsibilityNodeBase` hint interface.
 - Added a `chain` method to replace the existing `node` and `funcNode` methods.
