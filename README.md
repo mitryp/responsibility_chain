@@ -150,7 +150,7 @@ chain.chain((A arg) {
 
 The `chain` method of the chain can also be used to add a new object handler.
 
-It takes an `IResponsibilityNodeBase<R, A>`-like class object. Object handlers don't have any additional
+It takes an `IResponsibilityNodeBase<R, A>`-like object. Object handlers don't have any additional
 advantages except there can be more decomposition and management opportunities for objects compared to functions -
 it depends on your project structure.
 
@@ -158,7 +158,7 @@ To implement an `IResponsibilityNodeBase<R, A>`, you only need to implement its 
 `IResponsibilityNode`:
 
 ```dart
-class MyResponsibilityNode extends IResponsibilityNodeBase<R, A> {
+class MyResponsibilityNode implements IResponsibilityNodeBase<R, A> {
   FutureOr<ChainResult<R>> call(A args) {
     if (successCondition) {
       return ChainResult.success(value);
@@ -169,7 +169,7 @@ class MyResponsibilityNode extends IResponsibilityNodeBase<R, A> {
 }
 ```
 
-> It is not necessary for a class to directly implement the `IResponsibilityNodeBase` interface.
+> It is not necessary for a class to implement the `IResponsibilityNodeBase` interface explicitly.
 > The only requirement is for the class to have the `call` method with the correct signature.
 > The interface will allow the analyzer to hint the types though.
 

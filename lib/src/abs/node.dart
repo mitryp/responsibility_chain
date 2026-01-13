@@ -17,7 +17,7 @@ typedef IResponsibilityNode<R, A> = FutureOr<ChainResult<R>> Function(A args);
 /// as regular [IResponsibilityNode]s.
 ///
 /// The only method that needs to be implemented is [call], which corresponds to a [IResponsibilityNode] function type.
-abstract class IResponsibilityNodeBase<R, A> {
+abstract interface class IResponsibilityNodeBase<R, A> {
   const IResponsibilityNodeBase();
 
   /// A method that corresponds to the [IResponsibilityNode] signature.
