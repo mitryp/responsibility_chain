@@ -1,32 +1,30 @@
 import 'package:responsibility_chain/responsibility_chain.dart';
 
-/// This example demonstrates how to use create and use responsibility nodes from the `responsibility_chain` package.
-/// The usage of the IResponsibilityNodeBase subclasses will look exactly the same, but with an
-/// additional step of creating inherited classes for handlers.
+/// This example demonstrates how to create and use responsibility nodes from the `responsibility_chain` package.
 void main() async {
   // create a chain instance and chain handlers to it
   final rateFetchRespChain = ResponsibilityChainWithArgs<double, int>(
       orElse: (_) => -1)
     // the handlers can be functions with the [IResponsibilityNode] signature
     ..chain(localCacheHandler)
-    // or [IResponsibilityNodeBase]-like objects for more complex logic
-    ..chain(const ServerFetchHandler());
+    // or the `call` method of [IResponsibilityNodeBase]-like objects for more complex logic
+    ..chain(const ServerFetchHandler().call);
 
-  // the result handling is always happens asynchronously
+  // the result handling always happens asynchronously
   // the argument will be passed to each of the handler nodes during the execution
 
-  // 20.0 will be returned by databaseFetchHandler
+  // 20.0 will be returned by localCacheHandler
   print(await rateFetchRespChain.handle(20230215));
 
-  // if the databaseFetchHandler fails to return the result, the next handler will be called
+  // if the localCacheHandler fails to return the result, the next handler will be called
 
-  // 13.00 will be returned by serverFetchHandler
+  // 13.0 will be returned by ServerFetchHandler
   print(await rateFetchRespChain.handle(20230213));
 
   // if no handler succeeds to return the result, the result of orElse function from the chain
   // constructor will be returned
 
-  // -1 will be returned by orElse function as none of the handlers returned the result
+  // -1.0 will be returned by orElse function as none of the handlers returned the result
   print(await rateFetchRespChain.handle(20230209));
 }
 

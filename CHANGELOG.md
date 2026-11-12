@@ -1,3 +1,15 @@
+## 2.1.1
+
+- Reverted `IResponsibilityNodeBase` to an abstract class: 2.1.0 made it an interface class, which broke classes
+  extending it. It can be both extended and implemented again.
+- Fixed `handle` throwing a `ConcurrentModificationError` when a node was chained while it was running. Nodes chained
+  during a `handle` call are now used starting from the next call.
+- Lowered the `meta` constraint to `^1.9.1`, so the package resolves on Dart 3.0+ and on Flutter versions that pin
+  older `meta` versions again.
+- Updated the documentation and the example to chain object handlers by their `call` method, which avoids the
+  `implicit_call_tearoffs` lint.
+- Fixed the outdated library documentation and the README badge link.
+
 ## 2.1.0
 
 - Made the IResponsibilityNodeBase an interface instead of abstract class, so that classes that already extend other

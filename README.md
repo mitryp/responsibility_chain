@@ -1,4 +1,4 @@
-[![Dart Tests](https://github.com/mitryp/responsibility_chain/actions/workflows/test.yml/badge.svg)](https://github.com/mitryp/responsibility_chain/actions/workflows/dart.yml?branch=master)
+[![Dart Tests](https://github.com/mitryp/responsibility_chain/actions/workflows/test.yml/badge.svg)](https://github.com/mitryp/responsibility_chain/actions/workflows/test.yml?branch=master)
 [![Pub package](https://img.shields.io/pub/v/responsibility_chain.svg)](https://pub.dev/packages/responsibility_chain)
 [![Package publisher](https://img.shields.io/pub/publisher/responsibility_chain.svg)](https://pub.dev/packages/responsibility_chain/publisher)
 
@@ -37,24 +37,24 @@ void main() async {
   final rateFetchRespChain = ResponsibilityChainWithArgs<double, int>(orElse: (_) => -1)
     // the handlers can be functions with the [IResponsibilityNode] signature
     ..chain(localCacheHandler)
-    // or [IResponsibilityNodeBase]-like objects for more complex logic
-    ..chain(const ServerFetchHandler());
+    // or the `call` method of [IResponsibilityNodeBase]-like objects for more complex logic
+    ..chain(const ServerFetchHandler().call);
 
   // the result handling always happens asynchronously
   // the argument will be passed to each of the handler nodes during the execution
 
-  // 20.0 will be returned by databaseFetchHandler
+  // 20.0 will be returned by localCacheHandler
   print(await rateFetchRespChain.handle(20230215));
 
-  // if the databaseFetchHandler fails to return the result, the next handler will be called
+  // if the localCacheHandler fails to return the result, the next handler will be called
 
-  // 13.00 will be returned by serverFetchHandler
+  // 13.0 will be returned by ServerFetchHandler
   print(await rateFetchRespChain.handle(20230213));
 
   // if no handler succeeds to return the result, the result of orElse function from the chain
   // constructor will be returned
 
-  // -1 will be returned by orElse function as none of the handlers returned the result
+  // -1.0 will be returned by orElse function as none of the handlers returned the result
   print(await rateFetchRespChain.handle(20230209));
 }
 
@@ -106,11 +106,10 @@ were chained.
 Both of the classes have the following interface method signatures:
 
 - `void chain(IResponsibilityNode<R, A>)` - adds next handler to the end of the chain. The handler can either be a
-  function with the `IResponsibilityNode` signature, or an ancestor of the `IResponsibilityNodeBase` class implementing
-  a `call` method with the same signature.
-- `Future<R> handle(A arg)` - iterates through the chained nodes sequentially and calls each node's
-  `handle` method passing the `arg` as the argument. If the node returns a successful result, the value of the
-  computation
+  function with the `IResponsibilityNode` signature, or the `call` method of an object extending or implementing
+  `IResponsibilityNodeBase`.
+- `Future<R> handle(A arg)` - iterates through the chained nodes sequentially and calls each of them
+  passing the `arg` as the argument. If the node returns a successful result, the value of the computation
   will be returned. Otherwise, if the result is unsuccessful or the node throws an exception, the chain proceeds to the
   next node. If none of the handlers return a successful result, the chain will return the result of the `orElse`
   function.
@@ -150,15 +149,17 @@ chain.chain((A arg) {
 
 The `chain` method of the chain can also be used to add a new object handler.
 
-It takes an `IResponsibilityNodeBase<R, A>`-like object. Object handlers don't have any additional
-advantages except there can be more decomposition and management opportunities for objects compared to functions -
-it depends on your project structure.
+Pass the `call` method of an `IResponsibilityNodeBase<R, A>`-like object to it:
+`chain.chain(MyResponsibilityNode().call)`. Object handlers don't have any additional advantages except there can be
+more decomposition and management opportunities for objects compared to functions - it depends on your project
+structure.
 
-To implement an `IResponsibilityNodeBase<R, A>`, you only need to implement its `call` method with the signature of
+To extend or implement an `IResponsibilityNodeBase<R, A>`, you only need to implement its `call` method with the signature of
 `IResponsibilityNode`:
 
 ```dart
-class MyResponsibilityNode implements IResponsibilityNodeBase<R, A> {
+class MyResponsibilityNode extends IResponsibilityNodeBase<R, A> {
+  @override
   FutureOr<ChainResult<R>> call(A args) {
     if (successCondition) {
       return ChainResult.success(value);
@@ -169,7 +170,7 @@ class MyResponsibilityNode implements IResponsibilityNodeBase<R, A> {
 }
 ```
 
-> It is not necessary for a class to implement the `IResponsibilityNodeBase` interface explicitly.
+> It is not necessary for a class to extend or implement `IResponsibilityNodeBase` explicitly.
 > The only requirement is for the class to have the `call` method with the correct signature.
 > The interface will allow the analyzer to hint the types though.
 
