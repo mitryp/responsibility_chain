@@ -13,11 +13,11 @@ import '../../responsibility_chain.dart';
 /// See also: [ChainResult], [IResponsibilityNodeBase].
 typedef IResponsibilityNode<R, A> = FutureOr<ChainResult<R>> Function(A args);
 
-/// An alternative way to declare responsibility node handlers - implement [IResponsibilityNode] and treat its objects
-/// as regular [IResponsibilityNode]s.
+/// An alternative way to declare responsibility node handlers - extend or implement this class and pass the
+/// [call] method of its objects to the chain.
 ///
 /// The only method that needs to be implemented is [call], which corresponds to a [IResponsibilityNode] function type.
-abstract interface class IResponsibilityNodeBase<R, A> {
+abstract class IResponsibilityNodeBase<R, A> {
   const IResponsibilityNodeBase();
 
   /// A method that corresponds to the [IResponsibilityNode] signature.

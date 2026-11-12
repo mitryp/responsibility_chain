@@ -33,6 +33,8 @@ abstract class IResponsibilityChain<R, A> {
   /// This method iterates through the chained nodes in the precise order they had been chained and
   /// calls the [IResponsibilityNode]s with the argument [arg].
   ///
+  /// Nodes chained while this method is running are not called until the next [handle] call.
+  ///
   /// If a node returns a successful result, the method stops iterating and returns the result.
   /// Otherwise, if the result is not successful or throws an exception is thrown, the method
   /// proceeds to the next chained node.
@@ -64,7 +66,7 @@ class ResponsibilityChainWithArgs<R, A> implements IResponsibilityChain<R, A> {
   Future<R> handle(A args) async {
     ChainResult<R>? lastResult;
 
-    for (final node in nodes) {
+    for (final node in List.of(nodes)) {
       try {
         lastResult = await node(args);
       } on Exception {

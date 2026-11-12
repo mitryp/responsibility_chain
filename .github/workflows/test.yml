@@ -5,27 +5,56 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_call:
 
 jobs:
-  build:
+  analyze:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-
-      # Note: This workflow uses the latest stable version of the Dart SDK.
-      # You can specify other versions if desired, see documentation here:
-      # https://github.com/dart-lang/setup-dart/blob/main/README.md
+      - uses: actions/checkout@v7
       - uses: dart-lang/setup-dart@v1
 
       - name: Install dependencies
-        run: dart pub get --no-example
+        run: dart pub get
 
       - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed lib/
+        run: dart format --output=none --set-exit-if-changed .
 
       - name: Analyze project source
-        run: dart analyze lib/
+        run: dart analyze --fatal-infos
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # The minimum supported SDK and the latest stable one.
+        sdk: [ "3.0.0", stable ]
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+
+      - name: Install dependencies
+        run: dart pub get
 
       - name: Run tests
         run: dart test
+
+      - name: Run example
+        run: dart run example/responsibility_chain_example.dart
+
+  min-deps:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Install the lowest allowed dependencies
+        run: dart pub downgrade
+
+      - name: Analyze library source
+        run: dart analyze lib

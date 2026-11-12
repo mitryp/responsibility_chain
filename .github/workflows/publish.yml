@@ -6,13 +6,18 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
+  test:
+    name: Tests
+    uses: ./.github/workflows/test.yml
+
   pana:
+    needs: test
     name: Pana Analysis
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
@@ -24,7 +29,7 @@ jobs:
         run: dart pub global activate pana
 
       - name: Run pana
-        run: pana --exit-code-threshold 150 .
+        run: pana --exit-code-threshold 0 .
 
   publish:
     needs: pana
